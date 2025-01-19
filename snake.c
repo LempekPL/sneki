@@ -17,7 +17,7 @@ SnakeBody create_snake_body() {
 
 SnakePart* snake_segment_get(const SnakeBody* snake_body, size_t index) {
     if (index >= snake_body->length) {
-        exit(EXIT_FAILURE);
+        exit(1010101);
     }
     return snake_body->parts + index;
 }

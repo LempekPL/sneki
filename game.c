@@ -238,7 +238,7 @@ void update_game(GameData* game, TimeData* time) {
         }
     }
     if (game->state == GameState_Dead) {
-        if (game->scores.length > 0 && game->high_score != -1) {
+        if (game->scores.length > 2 && game->high_score != -1) {
             if (game->scores.scores[game->scores.length - 1].score < (int)game->points) {
                 game->high_score = 1;
             }

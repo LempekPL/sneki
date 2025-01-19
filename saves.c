@@ -95,6 +95,7 @@ void load_file(GameData* game, TimeData* time) {
         for (int i = 0; i < amount - snake->body.length; i++) {
             snake_segment_add(&snake->body);
         }
+        snake_segment_add(&snake->body);
     }
     for (int i = 0; i < amount; i++) {
         SnakePart* snake_part = snake_segment_get(&snake->body, i);
