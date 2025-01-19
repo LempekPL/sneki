@@ -9,7 +9,7 @@ void random_xy(const GameData* game, int* x, int* y) {
         *y = rand() % BOARD_SIZE;
     } while (
         is_snake_at(&game->snake.body, *x, *y) ||
-        is_portal_at(&game->portals, *x, *y) ||
+        is_near_portal(&game->portals, *x, *y) ||
         (*x == game->snake.head.x && *y == game->snake.head.y) ||
         (*x == game->blue_ball->x && *y == game->blue_ball->y) ||
         (game->red_ball != NULL && *x == game->red_ball->x && *y == game->red_ball->y)
@@ -218,9 +218,10 @@ void update_game(GameData* game, TimeData* time) {
             snake->speed *= 1 - (float) SPEEDUP_AMOUNT;
             game->speed_up_time = SDL_GetTicks();
         }
-        int speed = (float) snake->speed * (1.0 - (float) game->bonus_speed) < 10
-                        ? 10
-                        : (float) snake->speed * (1.0 - (float) game->bonus_speed);
+        int speed =
+                (float) snake->speed * (1.0 - game->bonus_speed) < 10
+                    ? 10
+                    : (float) snake->speed * (1.0 - game->bonus_speed);
         if (time->last_tick - snake->last_logic_tick >= speed) {
             update_snake(snake);
             check_snake_collision(game, snake);

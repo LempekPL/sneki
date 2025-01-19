@@ -13,6 +13,7 @@ typedef struct {
 } Portals;
 
 Portals create_portals(int amount);
-bool is_portal_at(const Portals* portal, int x, int y);
+bool is_portal_at(const Portals* portals, int x, int y);
+bool is_near_portal(const Portals* portals, int x, int y);
 
 #endif //PORTAL_H
