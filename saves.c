@@ -49,6 +49,7 @@ void load_file(GameData* game, TimeData* time) {
     free(game->portals.portals);
     FILE* save = fopen("./save.txt", "r");
     if (save == NULL) {
+        fclose(save);
         return;
     }
     int time_amount;
@@ -108,4 +109,5 @@ void load_file(GameData* game, TimeData* time) {
     }
     game->snake.next_direction = snake->head.direction;
     game->state = GameState_Playing;
+    fclose(save);
 }

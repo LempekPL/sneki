@@ -250,6 +250,51 @@ void render_portals(const SDL_Data* sdl, const GameData* game) {
     }
 }
 
+void render_name(const SDL_Data* sdl, Score* score, const SDL_Rect box, int offset) {
+    char text[100];
+    sprintf(text, "%s", score->name);
+    print_string(sdl, box.x + CHAR_SIZE * 5, box.y + CHAR_SIZE * offset, text);
+    sprintf(text, "%d", score->score);
+    print_string(sdl, box.x + box.w - CHAR_SIZE * (5 + strlen(text)), box.y + CHAR_SIZE * offset, text);
+}
+
+void render_highscores(const SDL_Data* sdl, const GameData* game) {
+    SDL_Rect box = {128, 256, 224, 96};
+    print_box(
+        sdl, box, 2,
+        SDL_MapRGB(sdl->screen->format, 0, 0, 0),
+        SDL_MapRGB(sdl->screen->format, 255, 255, 255)
+    );
+    char text[100];
+    sprintf(text, "Highscores");
+    print_string(sdl, box.x + box.w / 2 - CHAR_SIZE * (strlen(text) / 2), box.y + CHAR_SIZE * 2, text);
+
+    for (int i = 0; i < game->scores.length; i++) {
+        render_name(sdl, game->scores.scores + i, box, 4+i*2);
+    }
+}
+
+void render_highscore_add(const SDL_Data* sdl, const GameData* game) {
+    SDL_Rect box = {128, 96, 224, 128};
+    print_box(
+        sdl, box, 2,
+        SDL_MapRGB(sdl->screen->format, 0, 0, 0),
+        SDL_MapRGB(sdl->screen->format, 255, 255, 255)
+    );
+    char text[100];
+    sprintf(text, "HIGHSCORE!!!");
+    print_string(sdl, box.x + box.w / 2 - CHAR_SIZE * (strlen(text) / 2), box.y + CHAR_SIZE * 2, text);
+
+    sprintf(text, "You got %d points", game->points);
+    print_string(sdl, box.x + box.w / 2 - CHAR_SIZE * (strlen(text) / 2), box.y + CHAR_SIZE * 5, text);
+
+    sprintf(text, "%s", game->temp_text);
+    print_string(sdl, box.x + CHAR_SIZE * 2, box.y + CHAR_SIZE * 8, text);
+
+    sprintf(text, "[enter] - Save");
+    print_string(sdl, box.x + CHAR_SIZE * 2, box.y + box.h - CHAR_SIZE * 4, text);
+}
+
 void render_game(const SDL_Data* sdl, const GameData* game, const TimeData* time) {
     SDL_FillRect(sdl->screen, nullptr, SDL_MapRGB(sdl->screen->format, 0x00, 0x00, 0x00));
 
@@ -290,10 +335,14 @@ void render_game(const SDL_Data* sdl, const GameData* game, const TimeData* time
     switch (game->state) {
         case GameState_Dead:
             render_end(sdl, game, time);
+            render_highscores(sdl, game);
             break;
         case GameState_Win:
             render_win(sdl, game, time);
             break;
+    }
+    if (game->high_score == 1) {
+        render_highscore_add(sdl, game);
     }
 
     SDL_UpdateTexture(sdl->texture, nullptr, sdl->screen->pixels, sdl->screen->pitch);

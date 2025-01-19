@@ -18,6 +18,7 @@ void random_xy(const GameData* game, int* x, int* y) {
 
 GameData initGame() {
     GameData game = {0};
+    game.high_score = 0;
     game.snake = create_snake();
     game.state = GameState_Playing;
     game.ready_for_next_direction = true;
@@ -41,6 +42,7 @@ GameData initGame() {
         random_xy(&game, &two_x, &two_y);
         game.portals.portals[i] = (Portal){one_x, one_y, two_x, two_y, 0};
     }
+    game.scores = read_scores();
     return game;
 }
 
@@ -233,6 +235,15 @@ void update_game(GameData* game, TimeData* time) {
         }
         if (check_snake_correct_pos(snake)) {
             game->state = GameState_Dead;
+        }
+    }
+    if (game->state == GameState_Dead) {
+        if (game->scores.length > 0 && game->high_score != -1) {
+            if (game->scores.scores[game->scores.length - 1].score < (int)game->points) {
+                game->high_score = 1;
+            }
+        } else if (game->high_score != -1) {
+            game->high_score = 1;
         }
     }
 }
