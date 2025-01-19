@@ -241,5 +241,6 @@ void reset_game(GameData* game) {
     destroy_snake_body(&game->snake.body);
     free(game->blue_ball);
     free(game->red_ball);
+    free(game->portals.portals);
     *game = initGame();
 }

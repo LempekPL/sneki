@@ -13,6 +13,8 @@
 // snake_part_x, snake_part_y, snake_part_direction
 // ... (for snake_length)
 // snake_part_x, snake_part_y, snake_part_direction
+// portal amount
+// portal_one_x, portal_one_y, portal_two_x, portal_two_y
 
 void save_file(GameData* game, TimeData* time) {
     FILE* save = fopen("./save.txt", "w");
@@ -35,10 +37,16 @@ void save_file(GameData* game, TimeData* time) {
         SnakePart* snake_part = snake_segment_get(&snake->body, i);
         fprintf(save, "%d, %d, %d\n", snake_part->x, snake_part->y, snake_part->direction);
     }
+    fprintf(save, "%d\n", game->portals.length);
+    for (int i = 0; i < game->portals.length; i++) {
+        Portal* portal = game->portals.portals + i;
+        fprintf(save, "%d, %d, %d, %d\n", portal->one_x, portal->one_y, portal->two_x, portal->two_y);
+    }
     fclose(save);
 }
 
 void load_file(GameData* game, TimeData* time) {
+    free(game->portals.portals);
     FILE* save = fopen("./save.txt", "r");
     if (save == NULL) {
         return;
@@ -90,6 +98,13 @@ void load_file(GameData* game, TimeData* time) {
     for (int i = 0; i < amount; i++) {
         SnakePart* snake_part = snake_segment_get(&snake->body, i);
         fscanf(save, "%d, %d, %d\n", &snake_part->x, &snake_part->y, &snake_part->direction);
+    }
+    fscanf(save, "%d\n", &amount);
+    game->portals.portals = malloc(sizeof(Portal) * amount);
+    for (int i = 0; i < amount; i++) {
+        game->portals.length = amount;
+        Portal* portal = game->portals.portals + i;
+        fscanf(save, "%d, %d, %d, %d\n", &portal->one_x, &portal->one_y, &portal->two_x, &portal->two_y);
     }
     game->snake.next_direction = snake->head.direction;
     game->state = GameState_Playing;
