@@ -6,7 +6,7 @@
 #define SNAKE_DEFAULT_SPEED     500   // default speed of snake at start of every game (1 move per X ms)
 #define ANIMATION_SPEED         500   // texture changing speed in miliseconds
 #define SPEEDUP_TIME            10000 // speed up time in miliseconds
-#define SPEEDUP_AMOUNT          .01    // amount of % to reduce for next snake update
+#define SPEEDUP_AMOUNT          .1    // amount of % to reduce for next snake update
 #define RED_BONUS_MIN           2000  // min amount of time to wait in ms for red bonus
 #define RED_BONUS_MAX           2000  // max amount of time to wait in ms for red bonus
 #define RED_BONUS_WAIT          10000 // how much ms of time before red bonus dissapears

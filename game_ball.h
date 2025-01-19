@@ -10,6 +10,7 @@ typedef struct {
     int x,y;
     int frame;
     unsigned int last_bonus_time;
+    int load_save;
 } RedBall;
 
 BlueBall* create_blue_ball(int x, int y);

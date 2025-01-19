@@ -10,6 +10,7 @@ GameData initGame() {
     game.red_ball = nullptr;
     game.last_bonus_time = SDL_GetTicks();
     game.bonus_speed = 0;
+    game.load_bonus_speed = 0;
     game.bonus_speed_time = SDL_GetTicks();
     game.speed_up_time = SDL_GetTicks();
     game.bonus_wait_time = rand() % RED_BONUS_MAX + RED_BONUS_MIN;

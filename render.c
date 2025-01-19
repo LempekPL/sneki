@@ -133,11 +133,11 @@ void render_red_bar(const SDL_Data* sdl, const RedBall* red_ball) {
         BOARD_OFFSET,
         BOARD_OFFSET + TOP_BAR_OFFSET - bar_height - 4,
         (SCREEN_WIDTH - BOARD_OFFSET * 2) *
-        (1 - (float) (SDL_GetTicks() - red_ball->last_bonus_time) / (float) RED_BONUS_WAIT),
+        (1 - (float) (SDL_GetTicks() - red_ball->last_bonus_time + red_ball->load_save) / (float) RED_BONUS_WAIT),
         bar_height
     };
     SDL_FillRect(sdl->screen, &bar, SDL_MapRGB(sdl->screen->format, 255, 0, 0));
-    char text[] = "bonus point time!!!";
+    char text[100] = "bonus point!!!";
     print_string(sdl, bar.x, bar.y, text);
 }
 
@@ -151,7 +151,7 @@ void render_green_bar(const SDL_Data* sdl, const GameData* game) {
         bar_height
     };
     SDL_FillRect(sdl->screen, &bar, SDL_MapRGB(sdl->screen->format, 0, 255, 0));
-    char text[] = "bonus speed time";
+    char text[] = "bonus speed";
     print_string(sdl, bar.x, bar.y, text);
 }
 
@@ -195,6 +195,8 @@ void render_end(const SDL_Data* sdl, const GameData* game, const TimeData* time)
     print_string(sdl, box.x + box.w / 2 - CHAR_SIZE * (strlen(text) / 2), box.y + CHAR_SIZE * 6 + 2, text);
 
     sprintf(text, "[n] - New Game");
+    print_string(sdl, box.x + CHAR_SIZE * 2, box.y + box.h - CHAR_SIZE * 4, text);
+    sprintf(text, "[l] - Load last save");
     print_string(sdl, box.x + CHAR_SIZE * 2, box.y + box.h - CHAR_SIZE * 3, text);
     sprintf(text, "[esc] - Quit Game");
     print_string(sdl, box.x + CHAR_SIZE * 2, box.y + box.h - CHAR_SIZE * 2, text);
@@ -219,6 +221,8 @@ void render_win(const SDL_Data* sdl, const GameData* game, const TimeData* time)
     print_string(sdl, box.x + box.w / 2 - CHAR_SIZE * (strlen(text) / 2), box.y + CHAR_SIZE * 6 + 2, text);
 
     sprintf(text, "[n] - New Game");
+    print_string(sdl, box.x + CHAR_SIZE * 2, box.y + box.h - CHAR_SIZE * 4, text);
+    sprintf(text, "[l] - Load last save");
     print_string(sdl, box.x + CHAR_SIZE * 2, box.y + box.h - CHAR_SIZE * 3, text);
     sprintf(text, "[esc] - Quit Game");
     print_string(sdl, box.x + CHAR_SIZE * 2, box.y + box.h - CHAR_SIZE * 2, text);
@@ -228,12 +232,12 @@ void render_game(const SDL_Data* sdl, const GameData* game, const TimeData* time
     SDL_FillRect(sdl->screen, nullptr, SDL_MapRGB(sdl->screen->format, 0x00, 0x00, 0x00));
 
     char text[100];
-    sprintf(text, "FPS: %.f", time->fps, game->snake.speed * (1 - (float) game->bonus_speed));
+    sprintf(text, "FPS: %.f", time->fps);
     print_string(sdl, 2, 2, text);
 
     char time_text[10];
     format_time(time_text, time->time);
-    sprintf(text, "Time:  %s | Implemented: 1-4, A,B,C,D", time_text);
+    sprintf(text, "Time:  %s | Implemented: 1-4, A,B,C,D,E,G", time_text);
     print_string(sdl, 2, 12, text);
 
     format_time(time_text, time->since_start);

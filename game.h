@@ -14,7 +14,7 @@ typedef enum gamestate_t {
 typedef struct game_data_t {
     SnakeHead snake;
     unsigned int last_texture_tick, speed_up_time, last_bonus_time, bonus_wait_time, bonus_speed_time;
-    unsigned int points;
+    unsigned int points, load_bonus_speed;
     float bonus_speed;
     GameState state;
     bool ready_for_next_direction;

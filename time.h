@@ -2,7 +2,7 @@
 #define TIME_H
 
 typedef struct time_data_t {
-    double delta, time,since_start, fps, fps_timer;
+    double delta, time, since_start, fps, fps_timer;
     int frames;
     unsigned int last_tick;
 } TimeData;
