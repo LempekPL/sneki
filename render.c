@@ -228,6 +228,28 @@ void render_win(const SDL_Data* sdl, const GameData* game, const TimeData* time)
     print_string(sdl, box.x + CHAR_SIZE * 2, box.y + box.h - CHAR_SIZE * 2, text);
 }
 
+void render_portals(const SDL_Data* sdl, const GameData* game) {
+    for (int i = 0; i < game->portals.length; i++) {
+        Portal* portal = game->portals.portals + i;
+        SDL_Rect source, destination;
+        source.w = source.h = destination.w = destination.h = SNAKE_SIZE;
+        source.x = 5 * SNAKE_SIZE;
+        source.y = portal->frame * SNAKE_SIZE;
+        destination.x = BOARD_OFFSET + portal->one_x * SNAKE_SIZE;
+        destination.y = TOP_BAR_OFFSET + BOARD_OFFSET + portal->one_y * SNAKE_SIZE;
+        SDL_BlitSurface(sdl->snake_bmp, &source, sdl->screen, &destination);
+        char text[100];
+        sprintf(text, "%d", i + 1);
+        print_string(sdl, destination.x, destination.y, text);
+
+        destination.x = BOARD_OFFSET + portal->two_x * SNAKE_SIZE;
+        destination.y = TOP_BAR_OFFSET + BOARD_OFFSET + portal->two_y * SNAKE_SIZE;
+        SDL_BlitSurface(sdl->snake_bmp, &source, sdl->screen, &destination);
+        sprintf(text, "%d", i + 1);
+        print_string(sdl, destination.x, destination.y, text);
+    }
+}
+
 void render_game(const SDL_Data* sdl, const GameData* game, const TimeData* time) {
     SDL_FillRect(sdl->screen, nullptr, SDL_MapRGB(sdl->screen->format, 0x00, 0x00, 0x00));
 
@@ -237,7 +259,7 @@ void render_game(const SDL_Data* sdl, const GameData* game, const TimeData* time
 
     char time_text[10];
     format_time(time_text, time->time);
-    sprintf(text, "Time:  %s | Implemented: 1-4, A,B,C,D,E,G", time_text);
+    sprintf(text, "Time:  %s | Implemented: 1-4, A-H", time_text);
     print_string(sdl, 2, 12, text);
 
     format_time(time_text, time->since_start);
@@ -260,6 +282,8 @@ void render_game(const SDL_Data* sdl, const GameData* game, const TimeData* time
     if (game->bonus_speed != 0) {
         render_green_bar(sdl, game);
     }
+
+    render_portals(sdl, game);
     render_balls(sdl, game);
     render_snake(sdl, &game->snake);
 

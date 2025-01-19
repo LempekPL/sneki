@@ -1,6 +1,20 @@
 #include "game.h"
 #include <SDL_timer.h>
 #include "constants.h"
+#include "portal.h"
+
+void random_xy(const GameData* game, int* x, int* y) {
+    do {
+        *x = rand() % BOARD_SIZE;
+        *y = rand() % BOARD_SIZE;
+    } while (
+        is_snake_at(&game->snake.body, *x, *y) ||
+        is_portal_at(&game->portals, *x, *y) ||
+        (*x == game->snake.head.x && *y == game->snake.head.y) ||
+        (*x == game->blue_ball->x && *y == game->blue_ball->y) ||
+        (game->red_ball != NULL && *x == game->red_ball->x && *y == game->red_ball->y)
+    );
+}
 
 GameData initGame() {
     GameData game = {0};
@@ -20,6 +34,13 @@ GameData initGame() {
     } while (ball_y == BOARD_SIZE / 2);
     int ball_x = rand() % BOARD_SIZE;
     game.blue_ball = create_blue_ball(ball_x, ball_y);
+    game.portals = create_portals(PORTAL_PAIR_AMOUNT);
+    for (int i = 0; i < PORTAL_PAIR_AMOUNT; i++) {
+        int one_x, one_y, two_x, two_y;
+        random_xy(&game, &one_x, &one_y);
+        random_xy(&game, &two_x, &two_y);
+        game.portals.portals[i] = (Portal){one_x, one_y, two_x, two_y, 0};
+    }
     return game;
 }
 
@@ -86,16 +107,24 @@ bool check_snake_correct_pos(SnakeHead* snake) {
     return false;
 }
 
-void random_xy(const GameData* game, int* x, int* y) {
-    do {
-        *x = rand() % BOARD_SIZE;
-        *y = rand() % BOARD_SIZE;
-    } while (
-        is_snake_at(&game->snake.body, *x, *y) ||
-        (*x == game->snake.head.x && *y == game->snake.head.y) ||
-        (*x == game->blue_ball->x && *y == game->blue_ball->y) ||
-        (game->red_ball != NULL && *x == game->red_ball->x && *y == game->red_ball->y)
-    );
+void handle_teleportation(Portal* portal, SnakeHead* snake) {
+    if ((snake->head.x == portal->one_x && snake->head.y == portal->one_y) ||
+        (snake->head.x == portal->two_x && snake->head.y == portal->two_y)) {
+        bool isAtPortalOne = (snake->head.x == portal->one_x && snake->head.y == portal->one_y);
+        snake->head.x = isAtPortalOne ? portal->two_x : portal->one_x;
+        snake->head.y = isAtPortalOne ? portal->two_y : portal->one_y;
+
+        switch (snake->head.direction) {
+            case UP: snake->head.y--;
+                break;
+            case LEFT: snake->head.x--;
+                break;
+            case RIGHT: snake->head.x++;
+                break;
+            case DOWN: snake->head.y++;
+                break;
+        }
+    }
 }
 
 void check_snake_collision(GameData* game, SnakeHead* snake) {
@@ -121,16 +150,23 @@ void check_snake_collision(GameData* game, SnakeHead* snake) {
             game->bonus_speed = SPEED_BONUS;
             game->bonus_speed_time = SDL_GetTicks();
         } else {
-            if (snake->body.length > 2+REMOVE_SNAKE_SEGMENTS) {
+            if (snake->body.length > 2 + REMOVE_SNAKE_SEGMENTS) {
                 for (int i = 0; i < REMOVE_SNAKE_SEGMENTS; i++) {
                     snake_segment_remove(&snake->body);
                 }
             }
         }
     }
+    for (int i = 0; i < game->portals.length; i++) {
+        Portal* portal = game->portals.portals + i;
+        handle_teleportation(portal, snake);
+    }
+    if (snake->head.x < 0 || snake->head.y < 0 || snake->head.x >= BOARD_SIZE || snake->head.y >= BOARD_SIZE) {
+        game->state = GameState_Dead;
+    }
 }
 
-void change_balls_texture(GameData* game) {
+void change_frame_texture(GameData* game) {
     // blue ball
     game->blue_ball->frame++;
     if (game->blue_ball->frame > 4) {
@@ -143,12 +179,20 @@ void change_balls_texture(GameData* game) {
             game->red_ball->frame = 0;
         }
     }
+    // portals
+    for (int i = 0; i < game->portals.length; i++) {
+        Portal* portal = game->portals.portals + i;
+        portal->frame++;
+        if (portal->frame > 1) {
+            portal->frame = 0;
+        }
+    }
 }
 
 void update_game(GameData* game, TimeData* time) {
     if (game->state == GameState_Playing) {
         if (time->last_tick - game->last_texture_tick >= ANIMATION_SPEED) {
-            change_balls_texture(game);
+            change_frame_texture(game);
             game->last_texture_tick = SDL_GetTicks();
         }
         SnakeHead* snake = &game->snake;
@@ -171,10 +215,12 @@ void update_game(GameData* game, TimeData* time) {
             game->bonus_speed_time = SDL_GetTicks();
         }
         if (time->last_tick - game->speed_up_time >= SPEEDUP_TIME) {
-            snake->speed *= 1-(float)SPEEDUP_AMOUNT;
+            snake->speed *= 1 - (float) SPEEDUP_AMOUNT;
             game->speed_up_time = SDL_GetTicks();
         }
-        int speed = (float) snake->speed * (1.0 - (float) game->bonus_speed) < 10 ? 10 : (float) snake->speed * (1.0 - (float) game->bonus_speed);
+        int speed = (float) snake->speed * (1.0 - (float) game->bonus_speed) < 10
+                        ? 10
+                        : (float) snake->speed * (1.0 - (float) game->bonus_speed);
         if (time->last_tick - snake->last_logic_tick >= speed) {
             update_snake(snake);
             check_snake_collision(game, snake);

@@ -1,6 +1,7 @@
 #ifndef GAME_H
 #define GAME_H
 #include "game_ball.h"
+#include "portal.h"
 #include "snake.h"
 #include "time.h"
 
@@ -20,6 +21,7 @@ typedef struct game_data_t {
     bool ready_for_next_direction;
     BlueBall* blue_ball;
     RedBall* red_ball;
+    Portals portals;
 } GameData;
 
 GameData initGame();

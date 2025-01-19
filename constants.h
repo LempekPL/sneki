@@ -14,6 +14,7 @@
 #define SPEED_BONUS             .25   // amount of % to reduce from snake updates
 #define SPEED_BONUS_TIME        5000  // how much ms of time before speed bonus runs out
 #define REMOVE_SNAKE_SEGMENTS   1     // amount of segments to remove from snake
+#define PORTAL_PAIR_AMOUNT      2     // amount of pairs of portals on board to spawn
 
 #define CHAR_SIZE               8   // size of char in cs8x8.bmp in pixels
 #define SNAKE_SIZE              32  // size of texture atlass in snake.bmp in pixels

@@ -22,7 +22,9 @@ add_executable(sneki main.c
         game_ball.c
         game_ball.h
         saves.c
-        saves.h)
+        saves.h
+        portal.c
+        portal.h)
 
 if(WIN32)
     set(SDL2_INCLUDE_DIR C:/msys64/mingw64/include/SDL2)
