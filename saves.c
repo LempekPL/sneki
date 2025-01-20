@@ -46,12 +46,12 @@ void save_file(GameData* game, TimeData* time) {
 }
 
 void load_file(GameData* game, TimeData* time) {
-    free(game->portals.portals);
     FILE* save = fopen("./save.txt", "r");
     if (save == NULL) {
         fclose(save);
         return;
     }
+    free(game->portals.portals);
     int time_amount;
     fscanf(save, "%d, %d\n", &game->points, &time_amount);
     time->since_start = time_amount;
@@ -87,15 +87,15 @@ void load_file(GameData* game, TimeData* time) {
         "%d, %d, %d, %d, %d\n",
         &snake->head.x, &snake->head.y, &snake->head.direction, &snake->speed, &amount
     );
+    int len = snake->body.length;
     if (snake->body.length - amount > 0) {
-        for (int i = 0; i < snake->body.length - amount; i++) {
+        for (int i = 0; i < len - amount; i++) {
             snake_segment_remove(&snake->body);
         }
     } else {
-        for (int i = 0; i < amount - snake->body.length; i++) {
+        for (int i = 0; i < amount - len; i++) {
             snake_segment_add(&snake->body);
         }
-        snake_segment_add(&snake->body);
     }
     for (int i = 0; i < amount; i++) {
         SnakePart* snake_part = snake_segment_get(&snake->body, i);
@@ -110,5 +110,6 @@ void load_file(GameData* game, TimeData* time) {
     }
     game->snake.next_direction = snake->head.direction;
     game->state = GameState_Playing;
+    game->high_score = 0;
     fclose(save);
 }

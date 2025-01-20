@@ -289,7 +289,11 @@ void render_highscore_add(const SDL_Data* sdl, const GameData* game) {
     print_string(sdl, box.x + box.w / 2 - CHAR_SIZE * (strlen(text) / 2), box.y + CHAR_SIZE * 5, text);
 
     sprintf(text, "%s", game->temp_text);
-    print_string(sdl, box.x + CHAR_SIZE * 2, box.y + CHAR_SIZE * 8, text);
+    int len = strlen(text);
+    for (int i = 0; i < 10-len; i++) {
+        strcat(text, "_");
+    }
+    print_string(sdl, box.x + box.w / 2 - CHAR_SIZE * (strlen(text) / 2), box.y + CHAR_SIZE * 8, text);
 
     sprintf(text, "[enter] - Save");
     print_string(sdl, box.x + CHAR_SIZE * 2, box.y + box.h - CHAR_SIZE * 4, text);

@@ -29,49 +29,62 @@ void handle_snake(SDL_Event* event, GameData* game) {
     }
 }
 
+void handle_highscore(SDL_Event event, GameData* game) {
+    if (event.type == SDL_TEXTINPUT) {
+        if (strlen(game->temp_text) + strlen(event.text.text) < NAME_LENGTH + 1) {
+            strcat(game->temp_text, event.text.text);
+        }
+    }
+
+    if (event.type == SDL_KEYDOWN) {
+        if (event.key.keysym.sym == SDLK_BACKSPACE && strlen(game->temp_text) > 0) {
+            game->temp_text[strlen(game->temp_text) - 1] = '\0';
+        }
+        if (event.key.keysym.sym == SDLK_RETURN) {
+            if (game->scores.length == 0) {
+                game->scores.length = 1;
+                strcpy(game->scores.scores[0].name, game->temp_text);
+                game->scores.scores[0].score = (int) game->points;
+            } else {
+                bool added = false;
+                for (int i = 0; i < game->scores.length; i++) {
+                    if (game->scores.scores[i].score < game->points) {
+                        for (int j = game->scores.length; j > i; j--) {
+                            strcpy(game->scores.scores[j].name, game->scores.scores[j-1].name);
+                            game->scores.scores[j].score = game->scores.scores[j-1].score;
+                        }
+                        strcpy(game->scores.scores[i].name, game->temp_text);
+                        game->scores.scores[i].score = (int) game->points;
+                        added = true;
+                        break;
+                    }
+                }
+                if (!added) {
+                    strcpy(game->scores.scores[game->scores.length].name, game->temp_text);
+                    game->scores.scores[game->scores.length].score = (int) game->points;
+                }
+                if (game->scores.length >= 3) {
+                    game->scores.length = 3;
+                } else {
+                    game->scores.length++;
+                }
+            }
+            write_scores(&game->scores);
+            game->high_score = -1;
+        }
+    }
+}
+
 int handle_input(GameData* game, TimeData* time) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-        if (game->high_score == 1) {
-            if (event.type == SDL_TEXTINPUT) {
-                if (strlen(game->temp_text) + strlen(event.text.text) < NAME_LENGTH + 1) {
-                    strcat(game->temp_text, event.text.text);
-                }
-            }
+        if (event.type == SDL_QUIT) return 0;
 
-            if (event.type == SDL_KEYDOWN) {
-                if (event.key.keysym.sym == SDLK_BACKSPACE && strlen(game->temp_text) > 0) {
-                    game->temp_text[strlen(game->temp_text) - 1] = '\0';
-                }
-                if (event.key.keysym.sym == SDLK_RETURN) {
-                    if (game->scores.length == 0) {
-                        game->scores.length = 1;
-                        strcpy(game->scores.scores[0].name, game->temp_text);
-                        game->scores.scores[0].score = game->points;
-                    } else {
-                        bool first = true;
-                        for (int i = 0; i < game->scores.length; i++) {
-                            if (game->scores.scores[i].score < game->points) {
-                                strcpy(game->scores.scores[i+1].name, game->scores.scores[i].name);
-                                game->scores.scores[i+1].score = game->scores.scores[i].score;
-                                if (first) {
-                                    strcpy(game->scores.scores[i].name, game->temp_text);
-                                    game->scores.scores[i].score = game->points;
-                                    first = false;
-                                }
-                            }
-                        }
-                        game->scores.length++;
-                        game->scores.length = game->scores.length < 3 ? game->scores.length : 3;
-                    }
-                    write_scores(&game->scores);
-                    game->high_score = -1;
-                }
-            }
+        if (game->high_score == 1) {
+            handle_highscore(event, game);
             break;
         }
 
-        if (event.type == SDL_QUIT) return 0;
         if (event.type == SDL_KEYDOWN) {
             if (game->state == GameState_Playing) {
                 handle_snake(&event, game);

@@ -237,19 +237,20 @@ void update_game(GameData* game, TimeData* time) {
             game->state = GameState_Dead;
         }
     }
-    if (game->state == GameState_Dead) {
-        if (game->scores.length > 2 && game->high_score != -1) {
+    if (game->state == GameState_Dead && game->high_score == 0) {
+        if (game->scores.length < 3) {
+            game->high_score = 1;
+        } else {
             if (game->scores.scores[game->scores.length - 1].score < (int)game->points) {
                 game->high_score = 1;
             }
-        } else if (game->high_score != -1) {
-            game->high_score = 1;
         }
     }
 }
 
 void reset_game(GameData* game) {
     destroy_snake_body(&game->snake.body);
+    free_scores(&game->scores);
     free(game->blue_ball);
     free(game->red_ball);
     free(game->portals.portals);

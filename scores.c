@@ -24,7 +24,7 @@ Scores read_scores() {
     FILE* score = fopen("./scores.txt", "r");
     if (score == NULL) {
         fclose(score);
-        return (Scores) {malloc(3 * sizeof(Score)), 0};
+        return (Scores) {malloc(4 * sizeof(Score)), 0};
     }
     Scores scores;
     int amount = 0;
@@ -36,4 +36,8 @@ Scores read_scores() {
     }
     fclose(score);
     return scores;
+}
+
+void free_scores(const Scores* scores) {
+    free(scores->scores);
 }

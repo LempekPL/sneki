@@ -14,5 +14,6 @@ typedef struct {
 
 Scores read_scores();
 void write_scores(const Scores* scores);
+void free_scores(const Scores* scores);
 
 #endif //SCORES_H
